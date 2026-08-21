@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weeknight Kitchen — Christian & Jamie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1e2a32;
+    --ink-soft:#51616c;
+    --paper:#fbfaf7;
+    --card:#ffffff;
+    --line:#e4e1d8;
+    --lemon:#eab308;
+    --lemon-soft:#fdf3d0;
+    --herb:#2e6e4e;
+    --herb-soft:#e3efe8;
+    --meat:#c2543a;
+    --meat-soft:#f9e8e2;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Instrument Sans',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.55;
+    padding-bottom:72px;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 18px}
+
+  /* header */
+  header{padding:28px 0 10px}
+  .kicker{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:600;
+  }
+  h1{
+    font-family:'Bricolage Grotesque',sans-serif;
+    font-weight:800;font-size:clamp(30px,7vw,42px);
+    line-height:1.05;letter-spacing:-.01em;margin-top:6px;
+  }
+  h1 .lemon{color:var(--lemon)}
+  .sub{color:var(--ink-soft);margin-top:8px;font-size:15px}
+
+  /* tonight banner */
+  .tonight{
+    margin-top:18px;background:var(--ink);color:#fff;
+    border-radius:var(--radius);padding:16px 18px;
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  }
+  .tonight .label{
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--lemon);font-weight:600;white-space:nowrap;
+  }
+  .tonight .dish{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:17px;
+  }
+
+  /* tabs */
+  nav.tabs{
+    display:flex;gap:8px;margin:22px 0 4px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;padding-bottom:6px;
+  }
+  .tab{
+    flex:0 0 auto;border:1.5px solid var(--line);background:var(--card);
+    border-radius:999px;padding:9px 16px;font:600 14px 'Instrument Sans',sans-serif;
+    color:var(--ink-soft);cursor:pointer;transition:all .15s ease;white-space:nowrap;
+  }
+  .tab:hover{border-color:var(--ink)}
+  .tab[aria-selected="true"]{
+    background:var(--ink);border-color:var(--ink);color:#fff;
+  }
+  .tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px}
+  .tab .dot.meat{background:var(--meat)}
+  .tab .dot.fish{background:var(--herb)}
+  .tab[aria-selected="true"] .dot.meat{background:#ff9d84}
+  .tab[aria-selected="true"] .dot.fish{background:#7fc9a4}
+
+  /* panels */
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .recipe-card{
+    background:var(--card);border:1.5px solid var(--line);
+    border-radius:var(--radius);padding:22px 20px;margin-top:14px;
+  }
+  .recipe-card h2{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+    font-size:clamp(22px,5vw,28px);line-height:1.15;letter-spacing:-.01em;
+  }
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+  .chip{
+    font-size:12px;font-weight:600;border-radius:999px;padding:4px 11px;
+  }
+  .chip.fodmap{background:var(--herb-soft);color:var(--herb)}
+  .chip.protein{background:var(--meat-soft);color:var(--meat)}
+  .chip.time{background:var(--lemon-soft);color:#8a6a06}
+
+  h3{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:16px;
+    margin:20px 0 8px;display:flex;align-items:center;gap:8px;
+  }
+  h3::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  ul.ing{list-style:none}
+  ul.ing li{
+    padding:7px 0 7px 26px;position:relative;font-size:15px;
+    border-bottom:1px dashed var(--line);
+  }
+  ul.ing li:last-child{border-bottom:none}
+  ul.ing li::before{
+    content:"";position:absolute;left:4px;top:14px;
+    width:8px;height:8px;border-radius:50%;background:var(--lemon);
+  }
+
+  ol.steps{list-style:none;counter-reset:step}
+  ol.steps li{
+    counter-increment:step;position:relative;
+    padding:10px 0 10px 40px;font-size:15px;
+  }
+  ol.steps li::before{
+    content:counter(step);position:absolute;left:0;top:9px;
+    width:26px;height:26px;border-radius:50%;
+    background:var(--ink);color:var(--lemon);
+    font:600 13px 'Bricolage Grotesque',sans-serif;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  .plates{display:grid;gap:10px;margin-top:18px}
+  @media(min-width:520px){.plates{grid-template-columns:1fr 1fr}}
+  .plate{
+    border-radius:12px;padding:12px 14px;font-size:14px;
+  }
+  .plate.jamie{background:var(--meat-soft)}
+  .plate.leftovers{background:var(--lemon-soft)}
+  .plate strong{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+  .plate.jamie strong{color:var(--meat)}
+  .plate.leftovers strong{color:#8a6a06}
+
+  /* shopping */
+  .shop-card{
+    background:var(--card);border:1.5px solid var(--line);
+    border-radius:var(--radius);padding:22px 20px;margin-top:14px;
+  }
+  .shop-card h2{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;
+  }
+  .shop-card .when{color:var(--ink-soft);font-size:14px;margin-top:2px}
+  .group-label{
+    font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    font-weight:600;color:var(--ink-soft);margin:18px 0 6px;
+  }
+  label.item{
+    display:flex;align-items:flex-start;gap:11px;padding:8px 0;
+    border-bottom:1px dashed var(--line);cursor:pointer;font-size:15px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  label.item:last-of-type{border-bottom:none}
+  label.item input{
+    appearance:none;flex:0 0 auto;width:21px;height:21px;margin-top:1px;
+    border:2px solid var(--ink-soft);border-radius:6px;cursor:pointer;
+    display:grid;place-content:center;transition:all .12s ease;background:#fff;
+  }
+  label.item input:checked{background:var(--herb);border-color:var(--herb)}
+  label.item input:checked::before{
+    content:"✓";color:#fff;font-size:13px;font-weight:700;
+  }
+  label.item input:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
+  label.item input:checked + span{color:var(--ink-soft);text-decoration:line-through}
+  .shop-actions{margin-top:16px;display:flex;gap:10px;align-items:center}
+  .btn-reset{
+    border:1.5px solid var(--line);background:var(--paper);border-radius:999px;
+    padding:8px 16px;font:600 13px 'Instrument Sans',sans-serif;color:var(--ink-soft);
+    cursor:pointer;transition:all .15s ease;
+  }
+  .btn-reset:hover{border-color:var(--ink);color:var(--ink)}
+  .progress{font-size:13px;color:var(--ink-soft)}
+  .progress b{color:var(--herb)}
+
+  /* notes */
+  .notes{margin-top:14px;display:grid;gap:10px}
+  .note{
+    background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+    padding:14px 16px;font-size:14px;
+  }
+  .note strong{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:600;display:block;margin-bottom:2px;
+  }
+
+  footer{
+    margin-top:34px;padding:18px 0 8px;color:var(--ink-soft);
+    font-size:13px;border-top:1px solid var(--line);
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Mon – Thu · Cook once, eat twice</div>
+    <h1>Weeknight <span class="lemon">Kitchen</span></h1>
+    <p class="sub">Low-FODMAP for Dad · meat-first for Jamie · every dinner makes tomorrow's lunch.</p>
+    <div class="tonight" id="tonight">
+      <span class="label">Tonight</span>
+      <span class="dish" id="tonight-dish"></span>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Days and shopping lists" id="tabs"></nav>
+
+  <main id="panels"></main>
+
+  <footer>
+    Portions: every recipe serves 4 — dinner for two, lunch boxes for tomorrow.
+    Garlic-infused oil replaces garlic and onion everywhere. Ticked shopping items are saved on this device.
+  </footer>
+</div>
+
+<script>
+const DATA = {
+  days: [
+    {
+      id:"mon", tab:"Mon", type:"meat",
+      title:"Greek-Style Chicken Skewers with Lemon Rice",
+      short:"Greek chicken skewers, lemon rice",
+      time:"45 min",
+      ingredients:[
+        "1 kg chicken thigh fillets, cut into chunks",
+        "3 tbsp garlic-infused olive oil",
+        "2 lemons — juice + zest of one, wedges from the other",
+        "2 tsp dried oregano · 1 tsp paprika · salt, pepper",
+        "2 cups jasmine or basmati rice",
+        "1 large cucumber · 2 medium tomatoes",
+        "200 g lactose-free yoghurt (optional dill sauce)"
+      ],
+      steps:[
+        "Marinate chicken in garlic oil, lemon juice and zest, oregano, paprika, salt and pepper — 30 min if you have it, 10 min is fine.",
+        "Cook the rice; stir through a squeeze of lemon and a little olive oil.",
+        "Thread chicken onto skewers (or just pan-fry the chunks). Grill or pan-fry over high heat 10–12 min until charred and cooked through.",
+        "Dice cucumber and tomato; dress with olive oil, salt and a splash of lemon.",
+        "Optional: stir lemon, dill and salt into the yoghurt for a quick sauce."
+      ],
+      jamie:"Chicken + rice + yoghurt sauce. Salad optional.",
+      leftovers:"Box chicken and rice together; salad keeps a day in its own box."
+    },
+    {
+      id:"tue", tab:"Tue", type:"fish",
+      title:"Ginger-Soy Glazed Salmon with Rice & Pak Choi",
+      short:"Ginger-soy glazed salmon",
+      time:"30 min",
+      ingredients:[
+        "4 salmon fillets (~200 g each), skin-on",
+        "3 tbsp soy sauce (or tamari for gluten-free)",
+        "1 tbsp brown sugar or maple syrup",
+        "1 tbsp rice vinegar",
+        "2 tbsp fresh ginger, finely grated",
+        "2 cups jasmine rice",
+        "2–3 heads pak choi, halved",
+        "1 tbsp garlic-infused oil",
+        "Spring onion greens + sesame seeds to finish"
+      ],
+      steps:[
+        "Cook the rice.",
+        "Mix soy, sugar, vinegar and ginger. Pour half over the salmon; rest 10 min.",
+        "Pan-fry salmon skin-side down in garlic oil ~4 min until crisp, flip for 2–3 min, then pour in the remaining glaze and let it bubble and coat the fish.",
+        "Steam or pan-wilt pak choi with a splash of water, 2 min.",
+        "Serve over rice, glaze spooned over, spring onion greens and sesame on top."
+      ],
+      jamie:"Salmon is the meat-lover's fish — glaze it well, go light on pak choi.",
+      leftovers:"Salmon + rice boxes. Reheat gently, or eat cold flaked through the rice — genuinely good."
+    },
+    {
+      id:"wed", tab:"Wed", type:"meat",
+      title:"Spiced Beef Koftas with Roast Potatoes",
+      short:"Beef koftas, roast potato wedges",
+      time:"50 min",
+      ingredients:[
+        "1 kg beef mince (or 50/50 beef and lamb)",
+        "1 tsp each cumin, ground coriander, smoked paprika · ½ tsp cinnamon · salt, pepper",
+        "1 bunch spring onion greens, finely chopped",
+        "1 egg",
+        "1.2 kg potatoes, cut into wedges",
+        "3 tbsp garlic-infused olive oil",
+        "Carrot sticks + lactose-free yoghurt with lemon and cumin",
+        "Corn tortillas (optional, for tomorrow's wraps)"
+      ],
+      steps:[
+        "Oven to 220 °C. Toss wedges in half the oil and salt; roast 35–40 min, turning once.",
+        "Mix mince, spices, half the spring onion greens, egg and salt. Shape into 12 koftas.",
+        "Pan-fry koftas in the remaining oil ~4 min per side — or roast alongside the potatoes for the last 20 min.",
+        "Stir lemon juice and a pinch of cumin into the yoghurt for the sauce.",
+        "Scatter the rest of the spring onion greens over to serve."
+      ],
+      jamie:"Koftas + wedges + yoghurt sauce. Carrot sticks optional.",
+      leftovers:"Koftas reheat brilliantly — box with wedges, or wrap in warmed corn tortillas."
+    },
+    {
+      id:"thu", tab:"Thu", type:"fish",
+      title:"Crispy Baked Seabream with Lemon Potatoes & Green Beans",
+      short:"Crispy local seabream, lemon potatoes",
+      time:"50 min",
+      ingredients:[
+        "800 g locally farmed seabream fillets (or seabass — ask for UAE-farmed)",
+        "1 cup gluten-free breadcrumbs or crushed cornflakes",
+        "2 lemons — zest in the crumb, juice and wedges to serve",
+        "2 tsp paprika · 1 tsp dried thyme · salt, pepper",
+        "3 tbsp garlic-infused olive oil",
+        "1 kg baby potatoes, halved",
+        "300 g green beans, trimmed",
+        "Lactose-free yoghurt + lemon + dill (quick tartare-style sauce)"
+      ],
+      steps:[
+        "Oven to 200 °C. Toss potatoes in oil, salt and paprika; roast a 20-min head start.",
+        "Mix crumbs with lemon zest, thyme, paprika, salt and a drizzle of oil. Press onto the fish.",
+        "Add fish to the tray and roast 12–15 min until the crumb is golden and the fish flakes.",
+        "Add green beans (tossed in oil) alongside for the same 12–15 min.",
+        "Lemon juice over everything before serving."
+      ],
+      jamie:"Crispy-crumbed seabream eats like chicken tenders. Potatoes on the side, a few token beans.",
+      leftovers:"Reheat in an air fryer or hot oven to keep the crumb crisp — microwave works if he doesn't mind it soft."
+    }
+  ],
+  shops: [
+    {
+      id:"shop1", tab:"Shop 1", title:"Weekend Shop", when:"Saturday or Sunday · covers Monday + Tuesday",
+      groups:[
+        {label:"Protein", items:[
+          "1 kg chicken thigh fillets",
+          "4 salmon fillets (~800 g) — buy Sunday, or frozen and thaw Tuesday morning"
+        ]},
+        {label:"Produce", items:[
+          "3 lemons","1 large cucumber","2 medium tomatoes","2–3 heads pak choi",
+          "1 bunch spring onions","Fresh ginger (small knob)","Fresh dill (optional)"
+        ]},
+        {label:"Pantry & dairy — check what you have", items:[
+          "Jasmine or basmati rice (1 kg covers the week)",
+          "Garlic-infused olive oil (1 bottle covers the week)",
+          "Soy sauce or tamari","Rice vinegar","Brown sugar or maple syrup",
+          "Dried oregano","Paprika","Sesame seeds",
+          "500 g lactose-free yoghurt","Wooden skewers (optional)"
+        ]}
+      ]
+    },
+    {
+      id:"shop2", tab:"Shop 2", title:"Midweek Shop", when:"Tuesday or Wednesday · covers Wednesday + Thursday",
+      groups:[
+        {label:"Protein", items:[
+          "1 kg beef mince (or 500 g beef + 500 g lamb)",
+          "800 g UAE-farmed seabream or seabass fillets — Carrefour, Lulu and Waitrose fillet to order; Waterfront Market for wild local (sultan ibrahim, faskar, jesh)"
+        ]},
+        {label:"Produce", items:[
+          "2.2 kg potatoes (1.2 kg regular + 1 kg baby)","300 g green beans",
+          "2–3 carrots","1 bunch spring onions","3 lemons"
+        ]},
+        {label:"Pantry — likely stocked after Shop 1", items:[
+          "Cumin","Ground coriander","Smoked paprika","Cinnamon","Dried thyme",
+          "Gluten-free breadcrumbs or cornflakes","1 egg","Corn tortillas (optional)"
+        ]}
+      ]
+    }
+  ],
+  notes:[
+    {t:"Why seabream, not hammour", b:"Hammour is the UAE's most overfished species, and much of what's sold under the name is imported grouper anyway. Locally farmed seabream is genuinely local, days-fresh, mild and firm."},
+    {t:"Garlic-infused oil is the key ingredient", b:"All the flavour, none of the FODMAPs. Spinneys, Waitrose and Carrefour stock it (Colavita, Cobram Estate)."},
+    {t:"Protein check", b:"Each portion carries roughly 40–55 g protein toward the daily target. Salmon night doubles as the omega-3 top-up."},
+    {t:"Rough weekly cost", b:"AED 320–400 for four dinners plus lunches — well under meal kits or takeaway."}
+  ]
+};
+
+const KEY = "weeknight-kitchen-checks-v1";
+const loadChecks = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+let checks = loadChecks();
+const saveChecks = () => { try { localStorage.setItem(KEY, JSON.stringify(checks)); } catch {} };
+
+const tabsEl = document.getElementById("tabs");
+const panelsEl = document.getElementById("panels");
+
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+/* build tabs */
+const tabDefs = [
+  ...DATA.days.map(d => ({id:d.id, label:`<span class="dot ${d.type}"></span>${d.tab}`})),
+  ...DATA.shops.map(s => ({id:s.id, label:"🛒 " + s.tab}))
+];
+tabDefs.forEach(t => {
+  const b = el("button","tab",t.label);
+  b.id = "tab-" + t.id;
+  b.setAttribute("role","tab");
+  b.setAttribute("aria-controls","panel-" + t.id);
+  b.setAttribute("aria-selected","false");
+  b.addEventListener("click", () => select(t.id));
+  tabsEl.appendChild(b);
+});
+
+/* build day panels */
+DATA.days.forEach(d => {
+  const p = el("section","panel");
+  p.id = "panel-" + d.id;
+  p.setAttribute("role","tabpanel");
+  const card = el("article","recipe-card");
+  card.appendChild(el("h2",null,d.title));
+  const meta = el("div","meta");
+  meta.appendChild(el("span","chip time","⏱ " + d.time + " · serves 4"));
+  meta.appendChild(el("span","chip fodmap","Low-FODMAP"));
+  meta.appendChild(el("span","chip protein", d.type === "fish" ? "Fish night" : "Meat night"));
+  card.appendChild(meta);
+
+  card.appendChild(el("h3",null,"Ingredients"));
+  const ul = el("ul","ing");
+  d.ingredients.forEach(i => ul.appendChild(el("li",null,i)));
+  card.appendChild(ul);
+
+  card.appendChild(el("h3",null,"Method"));
+  const ol = el("ol","steps");
+  d.steps.forEach(s => ol.appendChild(el("li",null,s)));
+  card.appendChild(ol);
+
+  const plates = el("div","plates");
+  plates.appendChild(el("div","plate jamie","<strong>Jamie's plate</strong>" + d.jamie));
+  plates.appendChild(el("div","plate leftovers","<strong>Tomorrow's lunch</strong>" + d.leftovers));
+  card.appendChild(plates);
+
+  p.appendChild(card);
+  panelsEl.appendChild(p);
+});
+
+/* build shop panels */
+DATA.shops.forEach(s => {
+  const p = el("section","panel");
+  p.id = "panel-" + s.id;
+  p.setAttribute("role","tabpanel");
+  const card = el("article","shop-card");
+  card.appendChild(el("h2",null,s.title));
+  card.appendChild(el("p","when",s.when));
+
+  let total = 0;
+  s.groups.forEach((g,gi) => {
+    card.appendChild(el("div","group-label",g.label));
+    g.items.forEach((item,ii) => {
+      total++;
+      const id = `${s.id}-${gi}-${ii}`;
+      const lab = el("label","item");
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = !!checks[id];
+      input.addEventListener("change", () => {
+        checks[id] = input.checked;
+        if (!input.checked) delete checks[id];
+        saveChecks();
+        updateProgress(s.id);
+      });
+      lab.appendChild(input);
+      lab.appendChild(el("span",null,item));
+      lab.dataset.check = id;
+      card.appendChild(lab);
+    });
+  });
+
+  const actions = el("div","shop-actions");
+  const prog = el("span","progress");
+  prog.id = "progress-" + s.id;
+  prog.dataset.total = total;
+  const reset = el("button","btn-reset","Clear list");
+  reset.addEventListener("click", () => {
+    card.querySelectorAll("input[type=checkbox]").forEach(cb => {
+      cb.checked = false;
+      delete checks[cb.closest("label").dataset.check];
+    });
+    saveChecks();
+    updateProgress(s.id);
+  });
+  actions.appendChild(reset);
+  actions.appendChild(prog);
+  card.appendChild(actions);
+
+  p.appendChild(card);
+
+  const notes = el("div","notes");
+  DATA.notes.forEach(n => notes.appendChild(el("div","note","<strong>" + n.t + "</strong>" + n.b)));
+  p.appendChild(notes);
+
+  panelsEl.appendChild(p);
+});
+
+function updateProgress(shopId){
+  const prog = document.getElementById("progress-" + shopId);
+  if (!prog) return;
+  const panel = document.getElementById("panel-" + shopId);
+  const done = panel.querySelectorAll("input:checked").length;
+  prog.innerHTML = `<b>${done}</b> / ${prog.dataset.total} in the trolley`;
+}
+DATA.shops.forEach(s => updateProgress(s.id));
+
+function select(id){
+  tabDefs.forEach(t => {
+    document.getElementById("tab-" + t.id).setAttribute("aria-selected", String(t.id === id));
+    document.getElementById("panel-" + t.id).classList.toggle("active", t.id === id);
+  });
+}
+
+/* tonight = Dubai time; weekend/Friday points at the next cooking day */
+const dubaiDay = new Intl.DateTimeFormat("en-GB",{weekday:"short",timeZone:"Asia/Dubai"}).format(new Date()).toLowerCase();
+const map = {mon:"mon",tue:"tue",wed:"wed",thu:"thu"};
+const todayId = map[dubaiDay];
+const tonightEl = document.getElementById("tonight-dish");
+if (todayId){
+  const d = DATA.days.find(x => x.id === todayId);
+  tonightEl.textContent = d.short;
+  select(todayId);
+} else {
+  tonightEl.textContent = "Off-plan night — back Monday with " + DATA.days[0].short.toLowerCase();
+  select("mon");
+}
+</script>
+</body>
+</html>
